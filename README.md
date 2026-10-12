@@ -1,3 +1,4 @@
+
 # Dockerized Flask Task Manager with Kubernetes
 
 A simple Task Manager web application built with Flask, containerized with Docker,
@@ -5,7 +6,7 @@ and deployed on a local Kubernetes cluster using Minikube.
 
 This project is designed to be beginner-friendly and easy to run on Windows, macOS, or Linux.
 
----
+
 
 ## Project Overview
 
@@ -20,7 +21,7 @@ TaskFlow is a lightweight task management application that demonstrates the full
 **Interview summary:**
 > "I built a Flask Task Manager, containerized it with Docker, and deployed it on a Kubernetes cluster using Minikube. I created Kubernetes Deployment and Service manifests, added liveness and readiness health probes, automated tests with pytest, and configured GitHub Actions to test and build the Docker image."
 
----
+
 
 ## Features
 
@@ -32,7 +33,7 @@ TaskFlow is a lightweight task management application that demonstrates the full
 - `/health` endpoint for Kubernetes health probes
 - Clean REST API: `GET/POST /api/tasks`, `PUT/DELETE /api/tasks/<id>`
 
----
+
 
 ## Technology Stack
 
@@ -46,7 +47,6 @@ TaskFlow is a lightweight task management application that demonstrates the full
 | Testing | pytest |
 | CI/CD | GitHub Actions |
 
----
 
 ## Project Structure
 
@@ -85,7 +85,7 @@ kubernetes-task-app/
         └── ci.yml         # GitHub Actions CI pipeline
 ```
 
----
+
 
 ## Run Locally
 
@@ -445,3 +445,5 @@ minikube service task-manager -n task-app
 # Tests
 pytest -v
 ```
+# kubernetes-task-app
+569459843cb8a2d2a92ee3053e31cb92ee5d299e
