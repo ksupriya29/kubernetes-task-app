@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TaskFlow — Kubernetes Task Manager</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+</head>
+<body>
+  <!-- ──────────────────────────── HEADER ──────────────────────────── -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">⚡</span>
+        <span class="logo-text">TaskFlow</span>
+        <span class="logo-badge">K8s Edition</span>
+      </div>
+      <div class="header-meta">
+        <span id="status-indicator" class="status-dot green" title="Service healthy"></span>
+        <span id="status-text" class="status-text">Healthy</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ──────────────────────────── MAIN ──────────────────────────── -->
+  <main class="main">
+
+    <!-- Dashboard stats -->
+    <section class="stats-row" aria-label="Task statistics">
+      <div class="stat-card stat-total">
+        <div class="stat-icon">📋</div>
+        <div class="stat-body">
+          <div class="stat-value" id="stat-total">0</div>
+          <div class="stat-label">Total Tasks</div>
+        </div>
+      </div>
+      <div class="stat-card stat-done">
+        <div class="stat-icon">✅</div>
+        <div class="stat-body">
+          <div class="stat-value" id="stat-completed">0</div>
+          <div class="stat-label">Completed</div>
+        </div>
+      </div>
+      <div class="stat-card stat-pending">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-body">
+          <div class="stat-value" id="stat-pending">0</div>
+          <div class="stat-label">Pending</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Add-task form -->
+    <section class="card add-task-card" aria-label="Add a new task">
+      <h2 class="card-title">Add New Task</h2>
+      <form id="add-task-form" novalidate>
+        <div class="form-row">
+          <div class="form-group flex-grow">
+            <label for="task-title">Title <span aria-hidden="true">*</span></label>
+            <input
+              type="text"
+              id="task-title"
+              name="title"
+              placeholder="What needs to be done?"
+              required
+              maxlength="200"
+              autocomplete="off"
+            />
+            <span class="field-error" id="title-error" role="alert"></span>
+          </div>
+          <div class="form-group priority-group">
+            <label for="task-priority">Priority</label>
+            <select id="task-priority" name="priority">
+              <option value="low">🟢 Low</option>
+              <option value="medium" selected>🟡 Medium</option>
+              <option value="high">🔴 High</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="task-description">Description <span class="optional">(optional)</span></label>
+          <textarea
+            id="task-description"
+            name="description"
+            placeholder="Add more details…"
+            rows="2"
+            maxlength="1000"
+          ></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" id="add-btn">
+            <span class="btn-icon">＋</span> Add Task
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Filter bar -->
+    <section class="filter-bar" aria-label="Filter tasks">
+      <div class="filter-tabs" role="tablist">
+        <button class="tab active" role="tab" aria-selected="true" data-filter="all">All</button>
+        <button class="tab" role="tab" aria-selected="false" data-filter="pending">Pending</button>
+        <button class="tab" role="tab" aria-selected="false" data-filter="completed">Completed</button>
+      </div>
+      <div class="search-box">
+        <input
+          type="search"
+          id="search-input"
+          placeholder="Search tasks…"
+          aria-label="Search tasks"
+        />
+      </div>
+    </section>
+
+    <!-- Task list -->
+    <section class="card tasks-card" aria-label="Task list">
+      <div id="tasks-container">
+        <div class="empty-state" id="empty-state">
+          <div class="empty-icon">📝</div>
+          <p>No tasks yet — add one above!</p>
+        </div>
+        <ul id="task-list" class="task-list" aria-label="Tasks" role="list"></ul>
+      </div>
+      <div class="loading-overlay" id="loading" aria-live="polite" aria-busy="true" hidden>
+        <div class="spinner"></div>
+        <span>Loading…</span>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ──────────────────────────── TOAST ──────────────────────────── -->
+  <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- ──────────────────────────── MODAL (edit) ──────────────────────────── -->
+  <div id="edit-modal" class="modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modal-title">Edit Task</h2>
+        <button class="modal-close" id="modal-close-btn" aria-label="Close">&times;</button>
+      </div>
+      <form id="edit-task-form" novalidate>
+        <input type="hidden" id="edit-task-id" />
+        <div class="form-group">
+          <label for="edit-title">Title <span aria-hidden="true">*</span></label>
+          <input type="text" id="edit-title" required maxlength="200" />
+          <span class="field-error" id="edit-title-error" role="alert"></span>
+        </div>
+        <div class="form-row">
+          <div class="form-group flex-grow">
+            <label for="edit-description">Description</label>
+            <textarea id="edit-description" rows="2" maxlength="1000"></textarea>
+          </div>
+          <div class="form-group priority-group">
+            <label for="edit-priority">Priority</label>
+            <select id="edit-priority">
+              <option value="low">🟢 Low</option>
+              <option value="medium">🟡 Medium</option>
+              <option value="high">🔴 High</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" id="modal-cancel-btn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────── FOOTER ──────────────────────────── -->
+  <footer class="footer">
+    <p>
+      TaskFlow · Kubernetes-Based Task Manager ·
+      Built with Flask, Docker &amp; Kubernetes
+    </p>
+  </footer>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

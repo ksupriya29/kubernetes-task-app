@@ -1,0 +1,31 @@
+version: "3.9"
+
+# ──────────────────────────────────────────────
+# Flask Task Manager — Docker Compose
+# Single service: Flask app with SQLite
+#
+# Usage:
+#   docker compose up --build       # foreground
+#   docker compose up -d --build    # background
+#   docker compose down             # stop
+# ──────────────────────────────────────────────
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: task-manager
+    restart: unless-stopped
+    environment:
+      FLASK_ENV: production
+      SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
+      PORT: 5000
+    ports:
+      - "5000:5000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s

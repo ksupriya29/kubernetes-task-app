@@ -1,0 +1,53 @@
+# Version control
+.git
+.gitignore
+
+# Python artefacts
+__pycache__
+*.py[cod]
+*.pyo
+*.egg-info
+dist
+build
+
+# Virtual environments
+.venv
+venv
+ENV
+env
+
+# Test / coverage artefacts
+.pytest_cache
+.coverage
+htmlcov
+.tox
+
+# Local SQLite database
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE / OS
+.idea
+.vscode
+*.swp
+.DS_Store
+Thumbs.db
+
+# Docker Compose override files
+docker-compose.override.yml
+docker-compose.local.yml
+
+# Docs (not needed in image)
+README.md
+docs/
+
+# Kubernetes manifests (not needed inside container)
+k8s/
+
+# CI
+.github/
+
+# Env files (secrets must come from the runtime environment)
+.env
+.env.*
